@@ -1,7 +1,6 @@
 public class Event extends Task {
-    private final String from;
-    private final String to;
-    private final TaskType type = TaskType.EVENT;
+    private String from;
+    private String to;
 
     public Event(String description, String from, String to) {
         super(description);
@@ -11,8 +10,24 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[" + type.getSymbol() + "]"
+        return "[E]"
                 + super.toString()
-                + " (from: " + from + " to: " + to + ")";
+                + " (from: "
+                + from
+                + " to: "
+                + to
+                + ")";
+    }
+
+    @Override
+    public String toFileString() {
+        return "E | "
+                + (isDone ? "1" : "0")
+                + " | "
+                + description
+                + " | "
+                + from
+                + " | "
+                + to;
     }
 }
