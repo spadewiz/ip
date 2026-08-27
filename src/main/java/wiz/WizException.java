@@ -1,3 +1,5 @@
+package wiz;
+
 public class WizException extends Exception {
 
     public WizException(String message) {

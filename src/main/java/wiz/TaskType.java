@@ -1,3 +1,5 @@
+package wiz;
+
 public enum TaskType {
     TODO("T"),
     DEADLINE("D"),

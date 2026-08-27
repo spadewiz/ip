@@ -1,3 +1,5 @@
+package wiz;
+
 import java.util.ArrayList;
 
 public class TaskList {
