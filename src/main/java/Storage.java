@@ -1,11 +1,17 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Storage {
     private final String filePath;
+
+    private static final DateTimeFormatter FILE_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
     public Storage(String filePath) {
         this.filePath = filePath;
@@ -70,30 +76,39 @@ public class Storage {
 
         Task task;
 
-        if (type.equals("T")) {
-            task = new ToDo(description);
+        try {
+            if (type.equals("T")) {
+                task = new ToDo(description);
 
-        } else if (type.equals("D")) {
-            if (parts.length < 4) {
-                throw new IOException("Invalid deadline format.");
+            } else if (type.equals("D")) {
+                if (parts.length < 4) {
+                    throw new IOException("Invalid deadline format.");
+                }
+
+                LocalDateTime by =
+                        LocalDateTime.parse(parts[3], FILE_DATE_FORMAT);
+
+                task = new Deadline(description, by);
+
+            } else if (type.equals("E")) {
+                if (parts.length < 5) {
+                    throw new IOException("Invalid event format.");
+                }
+
+                LocalDateTime from =
+                        LocalDateTime.parse(parts[3], FILE_DATE_FORMAT);
+
+                LocalDateTime to =
+                        LocalDateTime.parse(parts[4], FILE_DATE_FORMAT);
+
+                task = new Event(description, from, to);
+
+            } else {
+                throw new IOException("Unknown task type.");
             }
 
-            String by = parts[3];
-
-            task = new Deadline(description, by);
-
-        } else if (type.equals("E")) {
-            if (parts.length < 5) {
-                throw new IOException("Invalid event format.");
-            }
-
-            String from = parts[3];
-            String to = parts[4];
-
-            task = new Event(description, from, to);
-
-        } else {
-            throw new IOException("Unknown task type.");
+        } catch (DateTimeParseException e) {
+            throw new IOException("Invalid date format in data file.");
         }
 
         if (isDone) {

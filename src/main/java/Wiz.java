@@ -1,9 +1,16 @@
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Wiz {
+
+    private static final DateTimeFormatter INPUT_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -38,9 +45,7 @@ public class Wiz {
                     System.out.println("Here are the tasks in your list:");
 
                     for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println(
-                                (i + 1) + "." + tasks.get(i)
-                        );
+                        System.out.println((i + 1) + "." + tasks.get(i));
                     }
 
                 } else if (input.equals("todo")) {
@@ -62,14 +67,10 @@ public class Wiz {
 
                     storage.save(tasks);
 
-                    System.out.println(
-                            "Got it. I've added this task:"
-                    );
+                    System.out.println("Got it. I've added this task:");
                     System.out.println("  " + task);
                     System.out.println(
-                            "Now you have "
-                                    + tasks.size()
-                                    + " tasks in the list."
+                            "Now you have " + tasks.size() + " tasks in the list."
                     );
 
                 } else if (input.equals("deadline")) {
@@ -91,7 +92,7 @@ public class Wiz {
                     String description =
                             details.substring(0, byIndex);
 
-                    String by =
+                    String byString =
                             details.substring(byIndex + 5);
 
                     if (description.isBlank()) {
@@ -100,11 +101,17 @@ public class Wiz {
                         );
                     }
 
-                    if (by.isBlank()) {
+                    if (byString.isBlank()) {
                         throw new WizException(
                                 "Oops! A deadline needs a /by value."
                         );
                     }
+
+                    LocalDateTime by =
+                            LocalDateTime.parse(
+                                    byString,
+                                    INPUT_DATE_FORMAT
+                            );
 
                     Task task =
                             new Deadline(description, by);
@@ -113,14 +120,10 @@ public class Wiz {
 
                     storage.save(tasks);
 
-                    System.out.println(
-                            "Got it. I've added this task:"
-                    );
+                    System.out.println("Got it. I've added this task:");
                     System.out.println("  " + task);
                     System.out.println(
-                            "Now you have "
-                                    + tasks.size()
-                                    + " tasks in the list."
+                            "Now you have " + tasks.size() + " tasks in the list."
                     );
 
                 } else if (input.equals("event")) {
@@ -146,13 +149,13 @@ public class Wiz {
                     String description =
                             details.substring(0, fromIndex);
 
-                    String from =
+                    String fromString =
                             details.substring(
                                     fromIndex + 7,
                                     toIndex
                             );
 
-                    String to =
+                    String toString =
                             details.substring(toIndex + 5);
 
                     if (description.isBlank()) {
@@ -161,11 +164,23 @@ public class Wiz {
                         );
                     }
 
-                    if (from.isBlank() || to.isBlank()) {
+                    if (fromString.isBlank() || toString.isBlank()) {
                         throw new WizException(
                                 "Oops! An event needs both /from and /to values."
                         );
                     }
+
+                    LocalDateTime from =
+                            LocalDateTime.parse(
+                                    fromString,
+                                    INPUT_DATE_FORMAT
+                            );
+
+                    LocalDateTime to =
+                            LocalDateTime.parse(
+                                    toString,
+                                    INPUT_DATE_FORMAT
+                            );
 
                     Task task =
                             new Event(description, from, to);
@@ -174,14 +189,10 @@ public class Wiz {
 
                     storage.save(tasks);
 
-                    System.out.println(
-                            "Got it. I've added this task:"
-                    );
+                    System.out.println("Got it. I've added this task:");
                     System.out.println("  " + task);
                     System.out.println(
-                            "Now you have "
-                                    + tasks.size()
-                                    + " tasks in the list."
+                            "Now you have " + tasks.size() + " tasks in the list."
                     );
 
                 } else if (input.startsWith("mark ")) {
@@ -297,6 +308,11 @@ public class Wiz {
 
             } catch (WizException e) {
                 System.out.println(e.getMessage());
+
+            } catch (DateTimeParseException e) {
+                System.out.println(
+                        "Oops! Please use the date format yyyy-MM-dd HHmm."
+                );
 
             } catch (IOException e) {
                 System.out.println(
