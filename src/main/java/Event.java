@@ -1,6 +1,7 @@
 public class Event extends Task {
-    private String from;
-    private String to;
+    private final String from;
+    private final String to;
+    private final TaskType type = TaskType.EVENT;
 
     public Event(String description, String from, String to) {
         super(description);
@@ -10,7 +11,8 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString()
+        return "[" + type.getSymbol() + "]"
+                + super.toString()
                 + " (from: " + from + " to: " + to + ")";
     }
 }
