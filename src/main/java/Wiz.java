@@ -13,80 +13,186 @@ public class Wiz {
         while (true) {
             String input = scanner.nextLine();
 
-            if (input.equals("bye")) {
-                System.out.println("Bye. Hope to see you again soon!");
-                break;
-            }
-
-            if (input.equals("list")) {
-                System.out.println("Here are the tasks in your list:");
-
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + "." + tasks[i]);
+            try {
+                if (input.equals("bye")) {
+                    System.out.println("Bye. Hope to see you again soon!");
+                    break;
                 }
 
-            } else if (input.startsWith("mark ")) {
-                int taskNumber = Integer.parseInt(input.substring(5));
-                int index = taskNumber - 1;
+                if (input.equals("list")) {
+                    System.out.println("Here are the tasks in your list:");
 
-                tasks[index].markAsDone();
+                    for (int i = 0; i < taskCount; i++) {
+                        System.out.println((i + 1) + "." + tasks[i]);
+                    }
 
-                System.out.println("Nice! I've marked this task as done:");
-                System.out.println("  " + tasks[index]);
+                } else if (input.equals("todo")) {
+                    throw new WizException(
+                            "Oops! A todo needs a description."
+                    );
 
-            } else if (input.startsWith("unmark ")) {
-                int taskNumber = Integer.parseInt(input.substring(7));
-                int index = taskNumber - 1;
+                } else if (input.startsWith("todo ")) {
+                    String description = input.substring(5);
 
-                tasks[index].markAsNotDone();
+                    if (description.isBlank()) {
+                        throw new WizException(
+                                "Oops! A todo needs a description."
+                        );
+                    }
 
-                System.out.println("OK, I've marked this task as not done yet:");
-                System.out.println("  " + tasks[index]);
+                    tasks[taskCount] = new ToDo(description);
 
-            } else if (input.startsWith("todo ")) {
-                String description = input.substring(5);
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks[taskCount]);
 
-                tasks[taskCount] = new ToDo(description);
+                    taskCount++;
+                    System.out.println(
+                            "Now you have " + taskCount + " tasks in the list."
+                    );
 
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[taskCount]);
+                } else if (input.equals("deadline")) {
+                    throw new WizException(
+                            "Oops! A deadline needs a description and /by time."
+                    );
 
-                taskCount++;
-                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                } else if (input.startsWith("deadline ")) {
+                    String details = input.substring(9);
+                    int byIndex = details.indexOf(" /by ");
 
-            } else if (input.startsWith("deadline ")) {
-                String details = input.substring(9);
+                    if (byIndex == -1) {
+                        throw new WizException(
+                                "Oops! Please specify the deadline using /by."
+                        );
+                    }
 
-                int byIndex = details.indexOf(" /by ");
+                    String description = details.substring(0, byIndex);
+                    String by = details.substring(byIndex + 5);
 
-                String description = details.substring(0, byIndex);
-                String by = details.substring(byIndex + 5);
+                    if (description.isBlank()) {
+                        throw new WizException(
+                                "Oops! A deadline needs a description."
+                        );
+                    }
 
-                tasks[taskCount] = new Deadline(description, by);
+                    if (by.isBlank()) {
+                        throw new WizException(
+                                "Oops! A deadline needs a /by value."
+                        );
+                    }
 
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[taskCount]);
+                    tasks[taskCount] = new Deadline(description, by);
 
-                taskCount++;
-                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks[taskCount]);
 
-            } else if (input.startsWith("event ")) {
-                String details = input.substring(6);
+                    taskCount++;
+                    System.out.println(
+                            "Now you have " + taskCount + " tasks in the list."
+                    );
 
-                int fromIndex = details.indexOf(" /from ");
-                int toIndex = details.indexOf(" /to ");
+                } else if (input.equals("event")) {
+                    throw new WizException(
+                            "Oops! An event needs a description, /from, and /to."
+                    );
 
-                String description = details.substring(0, fromIndex);
-                String from = details.substring(fromIndex + 7, toIndex);
-                String to = details.substring(toIndex + 5);
+                } else if (input.startsWith("event ")) {
+                    String details = input.substring(6);
 
-                tasks[taskCount] = new Event(description, from, to);
+                    int fromIndex = details.indexOf(" /from ");
+                    int toIndex = details.indexOf(" /to ");
 
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[taskCount]);
+                    if (fromIndex == -1 || toIndex == -1) {
+                        throw new WizException(
+                                "Oops! Use /from and /to for an event."
+                        );
+                    }
 
-                taskCount++;
-                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                    String description = details.substring(0, fromIndex);
+                    String from = details.substring(fromIndex + 7, toIndex);
+                    String to = details.substring(toIndex + 5);
+
+                    if (description.isBlank()) {
+                        throw new WizException(
+                                "Oops! An event needs a description."
+                        );
+                    }
+
+                    if (from.isBlank() || to.isBlank()) {
+                        throw new WizException(
+                                "Oops! An event needs both /from and /to values."
+                        );
+                    }
+
+                    tasks[taskCount] = new Event(description, from, to);
+
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks[taskCount]);
+
+                    taskCount++;
+                    System.out.println(
+                            "Now you have " + taskCount + " tasks in the list."
+                    );
+
+                } else if (input.startsWith("mark ")) {
+                    int taskNumber;
+
+                    try {
+                        taskNumber = Integer.parseInt(input.substring(5));
+                    } catch (NumberFormatException e) {
+                        throw new WizException(
+                                "Oops! Please give me a valid task number."
+                        );
+                    }
+
+                    int index = taskNumber - 1;
+
+                    if (index < 0 || index >= taskCount) {
+                        throw new WizException(
+                                "Oops! That task number does not exist."
+                        );
+                    }
+
+                    tasks[index].markAsDone();
+
+                    System.out.println(
+                            "Nice! I've marked this task as done:"
+                    );
+                    System.out.println("  " + tasks[index]);
+
+                } else if (input.startsWith("unmark ")) {
+                    int taskNumber;
+
+                    try {
+                        taskNumber = Integer.parseInt(input.substring(7));
+                    } catch (NumberFormatException e) {
+                        throw new WizException(
+                                "Oops! Please give me a valid task number."
+                        );
+                    }
+
+                    int index = taskNumber - 1;
+
+                    if (index < 0 || index >= taskCount) {
+                        throw new WizException(
+                                "Oops! That task number does not exist."
+                        );
+                    }
+
+                    tasks[index].markAsNotDone();
+
+                    System.out.println(
+                            "OK, I've marked this task as not done yet:"
+                    );
+                    System.out.println("  " + tasks[index]);
+
+                } else {
+                    throw new WizException(
+                            "Oops! I don't know what that command means."
+                    );
+                }
+
+            } catch (WizException e) {
+                System.out.println(e.getMessage());
             }
         }
 
