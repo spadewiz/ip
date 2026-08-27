@@ -1,11 +1,11 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Wiz {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         System.out.println("Hello! I'm Wiz.");
         System.out.println("What can I do for you?");
@@ -22,8 +22,8 @@ public class Wiz {
                 if (input.equals("list")) {
                     System.out.println("Here are the tasks in your list:");
 
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + "." + tasks.get(i));
                     }
 
                 } else if (input.equals("todo")) {
@@ -40,14 +40,13 @@ public class Wiz {
                         );
                     }
 
-                    tasks[taskCount] = new ToDo(description);
+                    Task task = new ToDo(description);
+                    tasks.add(task);
 
                     System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + tasks[taskCount]);
-
-                    taskCount++;
+                    System.out.println("  " + task);
                     System.out.println(
-                            "Now you have " + taskCount + " tasks in the list."
+                            "Now you have " + tasks.size() + " tasks in the list."
                     );
 
                 } else if (input.equals("deadline")) {
@@ -57,6 +56,7 @@ public class Wiz {
 
                 } else if (input.startsWith("deadline ")) {
                     String details = input.substring(9);
+
                     int byIndex = details.indexOf(" /by ");
 
                     if (byIndex == -1) {
@@ -80,14 +80,13 @@ public class Wiz {
                         );
                     }
 
-                    tasks[taskCount] = new Deadline(description, by);
+                    Task task = new Deadline(description, by);
+                    tasks.add(task);
 
                     System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + tasks[taskCount]);
-
-                    taskCount++;
+                    System.out.println("  " + task);
                     System.out.println(
-                            "Now you have " + taskCount + " tasks in the list."
+                            "Now you have " + tasks.size() + " tasks in the list."
                     );
 
                 } else if (input.equals("event")) {
@@ -123,14 +122,13 @@ public class Wiz {
                         );
                     }
 
-                    tasks[taskCount] = new Event(description, from, to);
+                    Task task = new Event(description, from, to);
+                    tasks.add(task);
 
                     System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + tasks[taskCount]);
-
-                    taskCount++;
+                    System.out.println("  " + task);
                     System.out.println(
-                            "Now you have " + taskCount + " tasks in the list."
+                            "Now you have " + tasks.size() + " tasks in the list."
                     );
 
                 } else if (input.startsWith("mark ")) {
@@ -146,18 +144,16 @@ public class Wiz {
 
                     int index = taskNumber - 1;
 
-                    if (index < 0 || index >= taskCount) {
+                    if (index < 0 || index >= tasks.size()) {
                         throw new WizException(
                                 "Oops! That task number does not exist."
                         );
                     }
 
-                    tasks[index].markAsDone();
+                    tasks.get(index).markAsDone();
 
-                    System.out.println(
-                            "Nice! I've marked this task as done:"
-                    );
-                    System.out.println("  " + tasks[index]);
+                    System.out.println("Nice! I've marked this task as done:");
+                    System.out.println("  " + tasks.get(index));
 
                 } else if (input.startsWith("unmark ")) {
                     int taskNumber;
@@ -172,18 +168,45 @@ public class Wiz {
 
                     int index = taskNumber - 1;
 
-                    if (index < 0 || index >= taskCount) {
+                    if (index < 0 || index >= tasks.size()) {
                         throw new WizException(
                                 "Oops! That task number does not exist."
                         );
                     }
 
-                    tasks[index].markAsNotDone();
+                    tasks.get(index).markAsNotDone();
 
                     System.out.println(
                             "OK, I've marked this task as not done yet:"
                     );
-                    System.out.println("  " + tasks[index]);
+                    System.out.println("  " + tasks.get(index));
+
+                } else if (input.startsWith("delete ")) {
+                    int taskNumber;
+
+                    try {
+                        taskNumber = Integer.parseInt(input.substring(7));
+                    } catch (NumberFormatException e) {
+                        throw new WizException(
+                                "Oops! Please give me a valid task number."
+                        );
+                    }
+
+                    int index = taskNumber - 1;
+
+                    if (index < 0 || index >= tasks.size()) {
+                        throw new WizException(
+                                "Oops! That task number does not exist."
+                        );
+                    }
+
+                    Task removedTask = tasks.remove(index);
+
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println("  " + removedTask);
+                    System.out.println(
+                            "Now you have " + tasks.size() + " tasks in the list."
+                    );
 
                 } else {
                     throw new WizException(
