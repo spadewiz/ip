@@ -3,142 +3,105 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Wiz {
 
-    private static final DateTimeFormatter INPUT_DATE_FORMAT =
+    private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+    private final Ui ui;
+    private final Storage storage;
+    private TaskList tasks;
 
-        Storage storage = new Storage(
-                "." + File.separator
-                        + "data" + File.separator
-                        + "wiz.txt"
-        );
-
-        ArrayList<Task> tasks;
+    public Wiz(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
 
         try {
-            tasks = storage.load();
+            tasks = new TaskList(storage.load());
         } catch (IOException e) {
-            System.out.println("Oops! I couldn't load your saved tasks.");
-            tasks = new ArrayList<>();
+            ui.showError("Oops! I couldn't load your saved tasks.");
+            tasks = new TaskList();
         }
+    }
 
-        System.out.println("Hello! I'm Wiz.");
-        System.out.println("What can I do for you?");
+    public void run() {
+        ui.showWelcome();
 
-        while (true) {
-            String input = scanner.nextLine();
+        boolean isRunning = true;
+
+        while (isRunning) {
+            String input = ui.readCommand();
 
             try {
-                if (input.equals("bye")) {
-                    System.out.println("Bye. Hope to see you again soon!");
-                    break;
-                }
+                String command = Parser.getCommandWord(input);
+                String arguments = Parser.getArguments(input);
 
-                if (input.equals("list")) {
-                    System.out.println("Here are the tasks in your list:");
+                if (command.equals("bye")) {
+                    ui.showGoodbye();
+                    isRunning = false;
+
+                } else if (command.equals("list")) {
+                    ui.showMessage("Here are the tasks in your list:");
 
                     for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + "." + tasks.get(i));
+                        ui.showMessage((i + 1) + "." + tasks.get(i));
                     }
 
-                } else if (input.equals("todo")) {
-                    throw new WizException(
-                            "Oops! A todo needs a description."
-                    );
-
-                } else if (input.startsWith("todo ")) {
-                    String description = input.substring(5);
-
-                    if (description.isBlank()) {
+                } else if (command.equals("todo")) {
+                    if (arguments.isBlank()) {
                         throw new WizException(
                                 "Oops! A todo needs a description."
                         );
                     }
 
-                    Task task = new ToDo(description);
+                    Task task = new ToDo(arguments);
                     tasks.add(task);
+                    storage.save(tasks.getTasks());
 
-                    storage.save(tasks);
-
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + task);
-                    System.out.println(
-                            "Now you have " + tasks.size() + " tasks in the list."
+                    ui.showMessage("Got it. I've added this task:");
+                    ui.showMessage("  " + task);
+                    ui.showMessage(
+                            "Now you have " + tasks.size()
+                                    + " tasks in the list."
                     );
 
-                } else if (input.equals("deadline")) {
-                    throw new WizException(
-                            "Oops! A deadline needs a description and /by time."
-                    );
-
-                } else if (input.startsWith("deadline ")) {
-                    String details = input.substring(9);
-
-                    int byIndex = details.indexOf(" /by ");
+                } else if (command.equals("deadline")) {
+                    int byIndex = arguments.indexOf(" /by ");
 
                     if (byIndex == -1) {
                         throw new WizException(
-                                "Oops! Please specify the deadline using /by."
+                                "Oops! Use /by for a deadline."
                         );
                     }
 
                     String description =
-                            details.substring(0, byIndex);
+                            arguments.substring(0, byIndex);
 
                     String byString =
-                            details.substring(byIndex + 5);
-
-                    if (description.isBlank()) {
-                        throw new WizException(
-                                "Oops! A deadline needs a description."
-                        );
-                    }
-
-                    if (byString.isBlank()) {
-                        throw new WizException(
-                                "Oops! A deadline needs a /by value."
-                        );
-                    }
+                            arguments.substring(byIndex + 5);
 
                     LocalDateTime by =
                             LocalDateTime.parse(
                                     byString,
-                                    INPUT_DATE_FORMAT
+                                    DATE_FORMAT
                             );
 
                     Task task =
                             new Deadline(description, by);
 
                     tasks.add(task);
+                    storage.save(tasks.getTasks());
 
-                    storage.save(tasks);
+                    ui.showMessage("Got it. I've added this task:");
+                    ui.showMessage("  " + task);
 
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + task);
-                    System.out.println(
-                            "Now you have " + tasks.size() + " tasks in the list."
-                    );
-
-                } else if (input.equals("event")) {
-                    throw new WizException(
-                            "Oops! An event needs a description, /from, and /to."
-                    );
-
-                } else if (input.startsWith("event ")) {
-                    String details = input.substring(6);
-
+                } else if (command.equals("event")) {
                     int fromIndex =
-                            details.indexOf(" /from ");
+                            arguments.indexOf(" /from ");
 
                     int toIndex =
-                            details.indexOf(" /to ");
+                            arguments.indexOf(" /to ");
 
                     if (fromIndex == -1 || toIndex == -1) {
                         throw new WizException(
@@ -147,156 +110,81 @@ public class Wiz {
                     }
 
                     String description =
-                            details.substring(0, fromIndex);
+                            arguments.substring(0, fromIndex);
 
                     String fromString =
-                            details.substring(
+                            arguments.substring(
                                     fromIndex + 7,
                                     toIndex
                             );
 
                     String toString =
-                            details.substring(toIndex + 5);
-
-                    if (description.isBlank()) {
-                        throw new WizException(
-                                "Oops! An event needs a description."
-                        );
-                    }
-
-                    if (fromString.isBlank() || toString.isBlank()) {
-                        throw new WizException(
-                                "Oops! An event needs both /from and /to values."
-                        );
-                    }
+                            arguments.substring(toIndex + 5);
 
                     LocalDateTime from =
                             LocalDateTime.parse(
                                     fromString,
-                                    INPUT_DATE_FORMAT
+                                    DATE_FORMAT
                             );
 
                     LocalDateTime to =
                             LocalDateTime.parse(
                                     toString,
-                                    INPUT_DATE_FORMAT
+                                    DATE_FORMAT
                             );
 
                     Task task =
                             new Event(description, from, to);
 
                     tasks.add(task);
+                    storage.save(tasks.getTasks());
 
-                    storage.save(tasks);
+                    ui.showMessage("Got it. I've added this task:");
+                    ui.showMessage("  " + task);
 
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + task);
-                    System.out.println(
-                            "Now you have " + tasks.size() + " tasks in the list."
-                    );
+                } else if (command.equals("mark")) {
+                    int index =
+                            Integer.parseInt(arguments) - 1;
 
-                } else if (input.startsWith("mark ")) {
-                    int taskNumber;
-
-                    try {
-                        taskNumber =
-                                Integer.parseInt(
-                                        input.substring(5)
-                                );
-                    } catch (NumberFormatException e) {
-                        throw new WizException(
-                                "Oops! Please give me a valid task number."
-                        );
-                    }
-
-                    int index = taskNumber - 1;
-
-                    if (index < 0 || index >= tasks.size()) {
-                        throw new WizException(
-                                "Oops! That task number does not exist."
-                        );
-                    }
+                    checkIndex(index);
 
                     tasks.get(index).markAsDone();
+                    storage.save(tasks.getTasks());
 
-                    storage.save(tasks);
-
-                    System.out.println(
+                    ui.showMessage(
                             "Nice! I've marked this task as done:"
                     );
-                    System.out.println(
-                            "  " + tasks.get(index)
-                    );
+                    ui.showMessage("  " + tasks.get(index));
 
-                } else if (input.startsWith("unmark ")) {
-                    int taskNumber;
+                } else if (command.equals("unmark")) {
+                    int index =
+                            Integer.parseInt(arguments) - 1;
 
-                    try {
-                        taskNumber =
-                                Integer.parseInt(
-                                        input.substring(7)
-                                );
-                    } catch (NumberFormatException e) {
-                        throw new WizException(
-                                "Oops! Please give me a valid task number."
-                        );
-                    }
-
-                    int index = taskNumber - 1;
-
-                    if (index < 0 || index >= tasks.size()) {
-                        throw new WizException(
-                                "Oops! That task number does not exist."
-                        );
-                    }
+                    checkIndex(index);
 
                     tasks.get(index).markAsNotDone();
+                    storage.save(tasks.getTasks());
 
-                    storage.save(tasks);
-
-                    System.out.println(
+                    ui.showMessage(
                             "OK, I've marked this task as not done yet:"
                     );
-                    System.out.println(
-                            "  " + tasks.get(index)
-                    );
+                    ui.showMessage("  " + tasks.get(index));
 
-                } else if (input.startsWith("delete ")) {
-                    int taskNumber;
+                } else if (command.equals("delete")) {
+                    int index =
+                            Integer.parseInt(arguments) - 1;
 
-                    try {
-                        taskNumber =
-                                Integer.parseInt(
-                                        input.substring(7)
-                                );
-                    } catch (NumberFormatException e) {
-                        throw new WizException(
-                                "Oops! Please give me a valid task number."
-                        );
-                    }
+                    checkIndex(index);
 
-                    int index = taskNumber - 1;
+                    Task removedTask = tasks.delete(index);
+                    storage.save(tasks.getTasks());
 
-                    if (index < 0 || index >= tasks.size()) {
-                        throw new WizException(
-                                "Oops! That task number does not exist."
-                        );
-                    }
-
-                    Task removedTask =
-                            tasks.remove(index);
-
-                    storage.save(tasks);
-
-                    System.out.println(
+                    ui.showMessage(
                             "Noted. I've removed this task:"
                     );
-                    System.out.println(
-                            "  " + removedTask
-                    );
-                    System.out.println(
-                            "Now you have "
-                                    + tasks.size()
+                    ui.showMessage("  " + removedTask);
+                    ui.showMessage(
+                            "Now you have " + tasks.size()
                                     + " tasks in the list."
                     );
 
@@ -307,20 +195,42 @@ public class Wiz {
                 }
 
             } catch (WizException e) {
-                System.out.println(e.getMessage());
+                ui.showError(e.getMessage());
+
+            } catch (NumberFormatException e) {
+                ui.showError(
+                        "Oops! Please give me a valid task number."
+                );
 
             } catch (DateTimeParseException e) {
-                System.out.println(
-                        "Oops! Please use the date format yyyy-MM-dd HHmm."
+                ui.showError(
+                        "Oops! Please use yyyy-MM-dd HHmm."
                 );
 
             } catch (IOException e) {
-                System.out.println(
+                ui.showError(
                         "Oops! I couldn't save your tasks."
                 );
             }
         }
 
-        scanner.close();
+        ui.close();
+    }
+
+    private void checkIndex(int index) throws WizException {
+        if (index < 0 || index >= tasks.size()) {
+            throw new WizException(
+                    "Oops! That task number does not exist."
+            );
+        }
+    }
+
+    public static void main(String[] args) {
+        String path =
+                "." + File.separator
+                        + "data" + File.separator
+                        + "wiz.txt";
+
+        new Wiz(path).run();
     }
 }
