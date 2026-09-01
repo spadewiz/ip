@@ -201,6 +201,19 @@ public class Wiz {
                                     + " tasks in the list."
                     );
 
+                } else if (command.equals("find")) {
+                    if (arguments.isBlank()) {
+                        throw new WizException(
+                                "Oops! A find command needs a keyword."
+                        );
+                    }
+
+                    ui.showMessage("Here are the matching tasks in your list:");
+                    java.util.ArrayList<Task> foundTasks = tasks.find(arguments.trim());
+                    for (int i = 0; i < foundTasks.size(); i++) {
+                        ui.showMessage((i + 1) + "." + foundTasks.get(i));
+                    }
+
                 } else {
                     throw new WizException(
                             "Oops! I don't know what that command means."
