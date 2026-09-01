@@ -21,11 +21,11 @@ public class Wiz {
     /**
      * Initializes the Wiz application with the specified storage file path.
      *
-     * @param filePath The path to the file where tasks are saved.
+     * @param path The path to the file where tasks are saved.
      */
-    public Wiz(String filePath) {
+    public Wiz(String path) {
         ui = new Ui();
-        storage = new Storage(filePath);
+        storage = new Storage(path);
 
         try {
             tasks = new TaskList(storage.load());
