@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Main application class for the Wiz task manager.
+ */
 public class Wiz {
 
     private static final DateTimeFormatter DATE_FORMAT =
@@ -15,9 +18,14 @@ public class Wiz {
     private final Storage storage;
     private TaskList tasks;
 
-    public Wiz(String filePath) {
+    /**
+     * Initializes the Wiz application with the specified storage file path.
+     *
+     * @param path The path to the file where tasks are saved.
+     */
+    public Wiz(String path) {
         ui = new Ui();
-        storage = new Storage(filePath);
+        storage = new Storage(path);
 
         try {
             tasks = new TaskList(storage.load());
@@ -27,6 +35,9 @@ public class Wiz {
         }
     }
 
+    /**
+     * Runs the main application loop, reading and processing user commands.
+     */
     public void run() {
         ui.showWelcome();
 
