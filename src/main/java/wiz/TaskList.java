@@ -13,8 +13,10 @@ public class TaskList {
         this.tasks = tasks;
     }
 
-    public void add(Task task) {
-        tasks.add(task);
+    public void add(Task... tasks) {
+        for (Task task : tasks) {
+            this.tasks.add(task);
+        }
     }
 
     public Task delete(int index) {
