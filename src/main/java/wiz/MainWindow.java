@@ -32,12 +32,16 @@ public class MainWindow extends AnchorPane {
     }
 
     /**
-     * Injects the Wiz instance.
+     * Injects the Wiz instance and shows the welcome message.
      *
      * @param d The Wiz instance to use.
      */
     public void setWiz(Wiz d) {
         wiz = d;
+        dialogContainer.getChildren().add(
+                DialogBox.getDukeDialog("Hello! I'm Wiz, your personal task assistant.\n"
+                        + "How can I help you today?", dukeImage)
+        );
     }
 
     /**
