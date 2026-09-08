@@ -2,37 +2,56 @@ package wiz;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
+/**
+ * Represents a task with a deadline.
+ */
 public class Deadline extends Task {
-    private LocalDateTime by;
+    private static final DateTimeFormatter DISPLAY_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd yyyy HHmm", Locale.US);
+    private static final DateTimeFormatter FILE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
+    private final LocalDateTime by;
+
+    /**
+     * Constructs a Deadline task with description and due date/time.
+     *
+     * @param description The task description.
+     * @param by The due date and time.
+     */
     public Deadline(String description, LocalDateTime by) {
         super(description);
+        assert by != null : "Deadline due time cannot be null";
         this.by = by;
+    }
+
+    /**
+     * Returns the due date and time of the deadline.
+     *
+     * @return The due LocalDateTime.
+     */
+    public LocalDateTime getBy() {
+        return by;
     }
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("MMM dd yyyy HHmm");
-
         return "[D]"
                 + super.toString()
                 + " (by: "
-                + by.format(formatter)
+                + by.format(DISPLAY_FORMATTER)
                 + ")";
     }
 
     @Override
     public String toFileString() {
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
-
         return "D | "
                 + (isDone ? "1" : "0")
                 + " | "
                 + description
                 + " | "
-                + by.format(formatter);
+                + by.format(FILE_FORMATTER);
     }
 }
