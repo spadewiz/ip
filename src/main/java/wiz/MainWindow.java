@@ -1,5 +1,7 @@
 package wiz;
 
+import java.util.Objects;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -23,11 +25,20 @@ public class MainWindow extends AnchorPane {
 
     private Wiz wiz;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Image userImage = new Image(
+            Objects.requireNonNull(this.getClass().getResourceAsStream("/images/DaUser.png"))
+    );
+    private final Image dukeImage = new Image(
+            Objects.requireNonNull(this.getClass().getResourceAsStream("/images/DaDuke.png"))
+    );
 
     @FXML
     public void initialize() {
+        assert scrollPane != null : "scrollPane was not injected properly";
+        assert dialogContainer != null : "dialogContainer was not injected properly";
+        assert userInput != null : "userInput was not injected properly";
+        assert sendButton != null : "sendButton was not injected properly";
+
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
@@ -37,6 +48,7 @@ public class MainWindow extends AnchorPane {
      * @param d The Wiz instance to use.
      */
     public void setWiz(Wiz d) {
+        assert d != null : "Wiz instance cannot be null";
         wiz = d;
         dialogContainer.getChildren().add(
                 DialogBox.getDukeDialog("Hello! I'm Wiz, your personal task assistant.\n"
@@ -50,6 +62,7 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
+        assert wiz != null : "Wiz instance must be initialized before handling user input";
         String input = userInput.getText();
         String response = wiz.getResponse(input);
         dialogContainer.getChildren().addAll(
