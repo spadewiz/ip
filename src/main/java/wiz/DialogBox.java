@@ -16,9 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 
 /**
- * An example of a custom control using JavaFX.
- * This control represents a dialog box consisting of an ImageView to represent the speaker's face and a label
- * containing text from the speaker.
+ * Custom JavaFX control representing a dialog box consisting of an ImageView and a text label.
  */
 public class DialogBox extends HBox {
     @FXML
@@ -27,6 +25,9 @@ public class DialogBox extends HBox {
     private ImageView displayPicture;
 
     private DialogBox(String text, Image img) {
+        assert text != null : "Dialog text cannot be null";
+        assert img != null : "Dialog image cannot be null";
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
             fxmlLoader.setController(this);
@@ -35,6 +36,9 @@ public class DialogBox extends HBox {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        assert dialog != null : "Dialog label was not injected properly";
+        assert displayPicture != null : "displayPicture was not injected properly";
 
         dialog.setText(text);
         displayPicture.setImage(img);
@@ -62,6 +66,8 @@ public class DialogBox extends HBox {
      * @return A DialogBox configured for the user.
      */
     public static DialogBox getUserDialog(String text, Image img) {
+        assert text != null : "User dialog text cannot be null";
+        assert img != null : "User image cannot be null";
         var db = new DialogBox(text, img);
         db.getStyleClass().add("user-dialog");
         return db;
@@ -75,6 +81,8 @@ public class DialogBox extends HBox {
      * @return A DialogBox configured for Duke/Wiz, flipped.
      */
     public static DialogBox getDukeDialog(String text, Image img) {
+        assert text != null : "Duke dialog text cannot be null";
+        assert img != null : "Duke image cannot be null";
         var db = new DialogBox(text, img);
         db.flip();
         db.getStyleClass().add("wiz-dialog");

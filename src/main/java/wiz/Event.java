@@ -2,47 +2,78 @@ package wiz;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
+/**
+ * Represents an event task occurring during a specific time period.
+ */
 public class Event extends Task {
-    private LocalDateTime from;
-    private LocalDateTime to;
+    private static final DateTimeFormatter DISPLAY_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd yyyy HHmm", Locale.US);
+    private static final DateTimeFormatter FILE_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
+    private final LocalDateTime from;
+    private final LocalDateTime to;
+
+    /**
+     * Constructs an Event task with description, start time, and end time.
+     *
+     * @param description The task description.
+     * @param from The start date and time.
+     * @param to The end date and time.
+     */
     public Event(
             String description,
             LocalDateTime from,
             LocalDateTime to
     ) {
         super(description);
+        assert from != null : "Event start time cannot be null";
+        assert to != null : "Event end time cannot be null";
+        assert !to.isBefore(from) : "Event end time cannot be before start time";
         this.from = from;
         this.to = to;
     }
 
+    /**
+     * Returns the start date and time of the event.
+     *
+     * @return The start LocalDateTime.
+     */
+    public LocalDateTime getFrom() {
+        return from;
+    }
+
+    /**
+     * Returns the end date and time of the event.
+     *
+     * @return The end LocalDateTime.
+     */
+    public LocalDateTime getTo() {
+        return to;
+    }
+
     @Override
     public String toString() {
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("MMM dd yyyy HHmm");
-
         return "[E]"
                 + super.toString()
                 + " (from: "
-                + from.format(formatter)
+                + from.format(DISPLAY_FORMATTER)
                 + " to: "
-                + to.format(formatter)
+                + to.format(DISPLAY_FORMATTER)
                 + ")";
     }
 
     @Override
     public String toFileString() {
-        DateTimeFormatter formatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
-
         return "E | "
                 + (isDone ? "1" : "0")
                 + " | "
                 + description
                 + " | "
-                + from.format(formatter)
+                + from.format(FILE_FORMATTER)
                 + " | "
-                + to.format(formatter);
+                + to.format(FILE_FORMATTER);
     }
 }

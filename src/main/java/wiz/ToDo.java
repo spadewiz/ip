@@ -1,9 +1,18 @@
 package wiz;
 
+/**
+ * Represents a Todo task without specific deadline or schedule.
+ */
 public class ToDo extends Task {
 
+    /**
+     * Constructs a ToDo task with the given description.
+     *
+     * @param description The task description.
+     */
     public ToDo(String description) {
         super(description);
+        assert this.description != null && !this.description.isBlank() : "ToDo description cannot be blank";
     }
 
     @Override
