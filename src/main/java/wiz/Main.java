@@ -22,9 +22,9 @@ public class Main extends Application {
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
-            stage.setTitle("Wiz - Task Manager");
-            stage.setMinHeight(220);
-            stage.setMinWidth(417);
+            stage.setTitle("Wiz - Magical Task Manager");
+            stage.setMinHeight(400);
+            stage.setMinWidth(420);
             fxmlLoader.<MainWindow>getController().setWiz(wiz);
             stage.show();
         } catch (IOException e) {
