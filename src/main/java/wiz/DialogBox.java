@@ -43,8 +43,8 @@ public class DialogBox extends HBox {
         dialog.setText(text);
         displayPicture.setImage(img);
 
-        // Clip the avatar to a circle
-        Circle clip = new Circle(25, 25, 25);
+        // Clip the avatar to a circle with smooth radius
+        Circle clip = new Circle(21, 21, 21);
         displayPicture.setClip(clip);
     }
 
@@ -74,18 +74,45 @@ public class DialogBox extends HBox {
     }
 
     /**
-     * Gets a dialog box for Duke/Wiz.
+     * Gets a dialog box for Wiz.
      *
      * @param text The text content.
-     * @param img The Duke/Wiz avatar image.
-     * @return A DialogBox configured for Duke/Wiz, flipped.
+     * @param img The Wiz avatar image.
+     * @return A DialogBox configured for Wiz, flipped.
      */
-    public static DialogBox getDukeDialog(String text, Image img) {
-        assert text != null : "Duke dialog text cannot be null";
-        assert img != null : "Duke image cannot be null";
+    public static DialogBox getWizDialog(String text, Image img) {
+        assert text != null : "Wiz dialog text cannot be null";
+        assert img != null : "Wiz image cannot be null";
         var db = new DialogBox(text, img);
         db.flip();
         db.getStyleClass().add("wiz-dialog");
         return db;
+    }
+
+    /**
+     * Gets an error dialog box for Wiz with highlighted error styling.
+     *
+     * @param text The error message text.
+     * @param img The Wiz avatar image.
+     * @return A DialogBox configured for Wiz with error styling, flipped.
+     */
+    public static DialogBox getErrorDialog(String text, Image img) {
+        assert text != null : "Error text cannot be null";
+        assert img != null : "Wiz image cannot be null";
+        var db = new DialogBox(text, img);
+        db.flip();
+        db.getStyleClass().addAll("wiz-dialog", "error-dialog");
+        return db;
+    }
+
+    /**
+     * Gets a dialog box for Wiz (retained for backward compatibility).
+     *
+     * @param text The text content.
+     * @param img The avatar image.
+     * @return A DialogBox configured for Wiz.
+     */
+    public static DialogBox getDukeDialog(String text, Image img) {
+        return getWizDialog(text, img);
     }
 }
