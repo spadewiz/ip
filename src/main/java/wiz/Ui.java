@@ -19,7 +19,8 @@ public class Ui {
      * Displays the welcome message.
      */
     public void showWelcome() {
-        showMessage("Hello! I'm Wiz.", "What can I do for you?");
+        showMessage("✨ Greetings, seeker of order! I am Wiz, your mystical task companion.",
+                "Cast a spell or type 'help' to see what we can do!");
     }
 
     /**
@@ -60,7 +61,7 @@ public class Ui {
      * Displays the goodbye message.
      */
     public void showGoodbye() {
-        System.out.println("Bye. Hope to see you again soon!");
+        System.out.println("✨ Farewell, traveler! May your tasks be ever completed. See you again soon!");
     }
 
     /**
