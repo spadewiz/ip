@@ -3,6 +3,7 @@ package wiz;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Represents an event task occurring during a specific time period.
@@ -52,6 +53,20 @@ public class Event extends Task {
      */
     public LocalDateTime getTo() {
         return to;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        Event event = (Event) obj;
+        return Objects.equals(from, event.from) && Objects.equals(to, event.to);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), from, to);
     }
 
     @Override

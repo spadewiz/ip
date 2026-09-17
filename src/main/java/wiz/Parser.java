@@ -9,7 +9,7 @@ public class Parser {
      * Extracts the command word from raw user input.
      *
      * @param input The raw input string from the user.
-     * @return The command word, or empty string if input is blank.
+     * @return The command word in lowercase, or empty string if input is blank.
      */
     public static String getCommandWord(String input) {
         assert input != null : "Input string cannot be null";
@@ -19,31 +19,25 @@ public class Parser {
             return "";
         }
 
-        int firstSpace = trimmed.indexOf(" ");
-
-        if (firstSpace == -1) {
-            return trimmed;
-        }
-
-        return trimmed.substring(0, firstSpace);
+        String[] parts = trimmed.split("\\s+", 2);
+        return parts[0].toLowerCase();
     }
 
     /**
      * Extracts the arguments portion from raw user input.
      *
      * @param input The raw input string from the user.
-     * @return The argument string, or empty string if no arguments are provided.
+     * @return The trimmed argument string, or empty string if no arguments are provided.
      */
     public static String getArguments(String input) {
         assert input != null : "Input string cannot be null";
         String trimmed = input.trim();
 
-        int firstSpace = trimmed.indexOf(" ");
-
-        if (firstSpace == -1) {
+        if (trimmed.isEmpty()) {
             return "";
         }
 
-        return trimmed.substring(firstSpace + 1);
+        String[] parts = trimmed.split("\\s+", 2);
+        return parts.length > 1 ? parts[1].trim() : "";
     }
 }

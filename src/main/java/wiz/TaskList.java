@@ -91,6 +91,17 @@ public class TaskList {
     }
 
     /**
+     * Checks if a duplicate task already exists in the list.
+     *
+     * @param task The task to check.
+     * @return True if an identical task is found, false otherwise.
+     */
+    public boolean hasDuplicate(Task task) {
+        assert task != null : "Task to check cannot be null";
+        return tasks.stream().anyMatch(t -> t.equals(task));
+    }
+
+    /**
      * Finds tasks that contain the specified keyword in their string representation.
      *
      * @param keyword The keyword to search for.
@@ -98,8 +109,9 @@ public class TaskList {
      */
     public ArrayList<Task> find(String keyword) {
         assert keyword != null : "Search keyword cannot be null";
+        String lowerKeyword = keyword.toLowerCase();
         return tasks.stream()
-                .filter(task -> task.toString().contains(keyword))
+                .filter(task -> task.toString().toLowerCase().contains(lowerKeyword))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 }

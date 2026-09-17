@@ -6,17 +6,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
  * Handles loading tasks from and saving tasks to a persistent storage file.
  */
 public class Storage {
-    private static final DateTimeFormatter FILE_DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+    private static final DateTimeFormatter FILE_DATE_FORMAT = new DateTimeFormatterBuilder()
+            .parseStrict()
+            .appendPattern("uuuu-MM-dd HHmm")
+            .toFormatter(Locale.US)
+            .withResolverStyle(ResolverStyle.STRICT);
 
     private final String filePath;
 
@@ -102,17 +108,20 @@ public class Storage {
                 break;
             case "D":
                 if (parts.length < 4) {
-                    throw new IOException("Invalid deadline format.");
+                    throw new IOException("Invalid deadline format in data file.");
                 }
                 LocalDateTime by = LocalDateTime.parse(parts[3], FILE_DATE_FORMAT);
                 task = new Deadline(description, by);
                 break;
             case "E":
                 if (parts.length < 5) {
-                    throw new IOException("Invalid event format.");
+                    throw new IOException("Invalid event format in data file.");
                 }
                 LocalDateTime from = LocalDateTime.parse(parts[3], FILE_DATE_FORMAT);
                 LocalDateTime to = LocalDateTime.parse(parts[4], FILE_DATE_FORMAT);
+                if (to.isBefore(from)) {
+                    throw new IOException("Invalid event dates in data file: end time is before start time.");
+                }
                 task = new Event(description, from, to);
                 break;
             default:

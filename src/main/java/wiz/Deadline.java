@@ -3,6 +3,7 @@ package wiz;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Represents a task with a deadline.
@@ -34,6 +35,20 @@ public class Deadline extends Task {
      */
     public LocalDateTime getBy() {
         return by;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        Deadline deadline = (Deadline) obj;
+        return Objects.equals(by, deadline.by);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), by);
     }
 
     @Override

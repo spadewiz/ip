@@ -1,5 +1,7 @@
 package wiz;
 
+import java.util.Objects;
+
 /**
  * Represents an abstract task with a description and completion status.
  */
@@ -14,7 +16,7 @@ public abstract class Task {
      */
     public Task(String description) {
         assert description != null && !description.isBlank() : "Task description cannot be null or blank";
-        this.description = description;
+        this.description = description.trim();
         this.isDone = false;
     }
 
@@ -64,6 +66,23 @@ public abstract class Task {
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Task task = (Task) obj;
+        return description.equalsIgnoreCase(task.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description.toLowerCase());
     }
 
     /**
