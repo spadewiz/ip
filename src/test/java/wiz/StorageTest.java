@@ -1,6 +1,7 @@
 package wiz;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -48,5 +49,30 @@ public class StorageTest {
 
         ArrayList<Task> loadedTasks = storage.load();
         assertEquals(0, loadedTasks.size());
+    }
+
+    @Test
+    public void parseTask_invalidFormat_throwsIOException() {
+        Storage storage = new Storage("dummy.txt");
+        assertThrows(IOException.class, () -> storage.parseTask("invalid"));
+        assertThrows(IOException.class, () -> storage.parseTask("D | 0 | return book"));
+        assertThrows(IOException.class, () -> storage.parseTask("E | 0 | event | 2026-09-11 0900"));
+        assertThrows(IOException.class, () -> storage.parseTask("X | 0 | unknown"));
+    }
+
+    @Test
+    public void parseTask_invalidDate_throwsIOException() {
+        Storage storage = new Storage("dummy.txt");
+        assertThrows(IOException.class, () ->
+                storage.parseTask("D | 0 | deadline | invalid-date"));
+        assertThrows(IOException.class, () ->
+                storage.parseTask("D | 0 | deadline | 2026-02-30 1800"));
+    }
+
+    @Test
+    public void parseTask_eventEndBeforeStart_throwsIOException() {
+        Storage storage = new Storage("dummy.txt");
+        assertThrows(IOException.class, () ->
+                storage.parseTask("E | 0 | event | 2026-09-12 1800 | 2026-09-12 1000"));
     }
 }

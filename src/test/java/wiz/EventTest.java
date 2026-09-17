@@ -1,6 +1,7 @@
 package wiz;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.time.LocalDateTime;
 
@@ -26,5 +27,29 @@ public class EventTest {
                 "[E][X] project meeting (from: Sep 12 2026 1400 to: Sep 12 2026 1600)",
                 event.toString()
         );
+    }
+
+    @Test
+    public void getters_returnCorrectValues() {
+        LocalDateTime from = LocalDateTime.of(2026, 9, 12, 14, 0);
+        LocalDateTime to = LocalDateTime.of(2026, 9, 12, 16, 0);
+        Event event = new Event("project meeting", from, to);
+        assertEquals(from, event.getFrom());
+        assertEquals(to, event.getTo());
+    }
+
+    @Test
+    public void equalsAndHashCode_sameValues_equal() {
+        LocalDateTime from = LocalDateTime.of(2026, 9, 12, 14, 0);
+        LocalDateTime to = LocalDateTime.of(2026, 9, 12, 16, 0);
+        Event e1 = new Event("meeting", from, to);
+        Event e2 = new Event("MEETING", from, to);
+        Event e3 = new Event("other", from, to);
+        Event e4 = new Event("meeting", from.plusHours(1), to);
+
+        assertEquals(e1, e2);
+        assertEquals(e1.hashCode(), e2.hashCode());
+        assertNotEquals(e1, e3);
+        assertNotEquals(e1, e4);
     }
 }
