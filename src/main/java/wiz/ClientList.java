@@ -91,6 +91,19 @@ public class ClientList {
     }
 
     /**
+     * Checks if a duplicate client already exists in the list.
+     *
+     * @param client The client to check.
+     * @return True if a client with matching name, phone, or email exists, false otherwise.
+     */
+    public boolean hasDuplicate(Client client) {
+        assert client != null : "Client to check cannot be null";
+        return clients.stream().anyMatch(c -> c.getName().equalsIgnoreCase(client.getName())
+                || c.getPhone().equalsIgnoreCase(client.getPhone())
+                || c.getEmail().equalsIgnoreCase(client.getEmail()));
+    }
+
+    /**
      * Finds clients that contain the specified keyword in their string representation.
      *
      * @param keyword The keyword to search for.
