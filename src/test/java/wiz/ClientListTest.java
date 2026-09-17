@@ -45,5 +45,19 @@ public class ClientListTest {
         assertEquals(2, result.size());
         assertEquals(client1, result.get(0));
         assertEquals(client2, result.get(1));
+
+        ArrayList<Client> caseInsensitiveResult = clientList.find("INSURANCE");
+        assertEquals(2, caseInsensitiveResult.size());
+    }
+
+    @Test
+    public void hasDuplicate_matchingNameOrPhoneOrEmail_returnsTrue() {
+        Client client = new Client("Alice Tan", "91234567", "alice@example.com");
+        ClientList clientList = new ClientList(client);
+
+        assertEquals(true, clientList.hasDuplicate(new Client("Alice Tan", "88888888", "other@example.com")));
+        assertEquals(true, clientList.hasDuplicate(new Client("Other", "91234567", "other@example.com")));
+        assertEquals(true, clientList.hasDuplicate(new Client("Other", "88888888", "alice@example.com")));
+        assertEquals(false, clientList.hasDuplicate(new Client("Dave", "88888888", "dave@example.com")));
     }
 }
