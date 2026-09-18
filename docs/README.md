@@ -2,6 +2,8 @@
 
 Wiz is an intelligent desktop assistant and task manager tailored for tracking tasks, events, deadlines, and client contacts.
 
+![Wiz GUI](Ui.png)
+
 ---
 
 ## Features
